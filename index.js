@@ -60,13 +60,36 @@ app.get('/products/:id', async (req, res) => {
   try {
     const { db } = await connectToDatabase();
     const id = req.params.id;
-    const query = { _id: new ObjectId(id)}
+    const query = { _id: new ObjectId(id) }
     const result = await db.collection('products').findOne(query);
     res.send(result);
-  }catch (error) { 
+  } catch (error) {
     console.error('Error fetching product by ID:', error);
   }
 })
+
+app.put('/products/:id', async (req, res) => {
+  const id = req.params.id;
+  const filter = { _id: new ObjectId(id) };
+  const updatedProduct = req.body;
+  const options = { upsert: true };
+  const updateDoc = {
+    $set: {
+      name: updatedProduct.productName,
+      price: updatedProduct.price,
+      description: updatedProduct.description,
+      brand: updatedProduct.brandName,
+      stock: updatedProduct.stock,
+      colors: updatedProduct.colors,
+      category: updatedProduct.category,
+      images: updatedProduct.images,
+    },
+
+  }
+  const result = await usersCollection.updateOne(filter, updateDoc, options);
+  req.send(result);
+}
+);
 
 app.post('/products', async (req, res) => {
   try {
